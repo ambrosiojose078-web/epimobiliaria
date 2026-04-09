@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="pt-ao">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EP Imobiliária | Consultoria & Segurança Jurídica</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; scroll-behavior: smooth; overflow-x: hidden; }
+        [x-cloak] { display: none !important; }
+        .bg-ep-green { background-color: #0d5e35; }
+        .text-ep-green { color: #0d5e35; }
+        .border-ep-green { border-color: #0d5e35; }
+        .glass-nav { background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(20px); }
+        .hero-overlay { background: linear-gradient(90deg, rgba(15, 23, 42, 0.9) 0%, rgba(15, 23, 42, 0.6) 100%); }
+        .footer-overlay { background: linear-gradient(to bottom, rgba(15, 23, 42, 0.8) 0%, rgba(15, 23, 42, 1) 100%); }
+        .glass-login { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(25px); border: 1px solid rgba(255,255,255,0.1); }
+        .pulse-live { animation: pulse-green 2s infinite; }
+        @keyframes pulse-green {
+            0% { box-shadow: 0 0 0 0 rgba(13, 94, 53, 0.7); }
+            70% { box-shadow: 0 0 0 15px rgba(13, 94, 53, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(13, 94, 53, 0); }
+        }
+        .lottery-num { display: inline-block; min-width: 1.2ch; text-align: center; transition: all 0.1s; }
+    </style>
+</head>
+<body class="bg-[#fcfdfd] text-slate-900" x-data="epApp()" x-init="init()">
+
+    <!-- BARRA DE HORÁRIO -->
+    <div class="bg-slate-900 text-white py-3 px-4 text-[10px] font-black uppercase tracking-[0.3em] border-b border-white/5 relative z-[110]">
+        <div class="container mx-auto flex flex-col md:flex-row justify-between items-center gap-3">
+            <div class="flex items-center gap-6 text-left">
+                <span><i class="far fa-clock text-ep-green mr-2 scale-125"></i> SEG-SEX: 08H00 - 17H00 | SÁBADO: 08H00 - 12H00</span>
+            </div>
+            <div class="flex gap-6 items-center">
+                <a :href="social.fb" target="_blank" class="hover:text-ep-green transition"><i class="fab fa-facebook-f text-sm"></i></a>
+                <a :href="social.ig" target="_blank" class="hover:text-ep-green transition"><i class="fab fa-instagram text-sm"></i></a>
+                <a :href="social.wa" target="_blank" class="hover:text-ep-green transition flex items-center gap-2 font-black"><i class="fab fa-whatsapp text-green-400"></i> APOIO AO CLIENTE</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- NAVEGAÇÃO -->
+    <nav class="sticky top-0 z-[100] glass-nav border-b border-slate-100 shadow-sm">
+        <div class="container mx-auto px-4 h-24 flex justify-between items-center text-left">
+            <div @click="view = 'client'; window.scrollTo(0,0)" class="flex items-center gap-4 cursor-pointer group">
+                <img src="https://i.ibb.co/B5v845dQ/logo.png" alt="EP Imobiliária" class="h-16 md:h-20 transition-transform group-hover:scale-105">
+                <div class="hidden lg:block border-l-2 pl-5 border-slate-200">
+                    <h1 class="text-ep-green text-2xl font-black uppercase tracking-tighter">EP IMOBILIÁRIA</h1>
+                    <p class="text-[9px] text-slate-400 font-black uppercase mt-1 tracking-widest">Excelência & Segurança Jurídica</p>
+                </div>
+            </div>
+            <div class="hidden lg:flex items-center gap-10 text-[11px] font-black uppercase tracking-widest text-slate-500">
+                <a @click="view = 'about'; window.scrollTo(0,0)" class="cursor-pointer hover:text-ep-green transition">Sobre Nós</a>
+                <a href="#servicos" class="hover:text-ep-green transition">Nossos Serviços</a>
+                <a href="#imoveis" class="hover:text-ep-green transition">Portfólio</a>
+                <button @click="view = 'client'; setTimeout(() => document.getElementById('form-tecnico').scrollIntoView(), 100)" class="bg-ep-green text-white px-8 py-4 rounded-2xl hover:shadow-2xl transition-all">Solicitar Consultoria</button>
+            </div>
+            <button @click="showLogin = true" class="w-12 h-12 bg-slate-50 text-slate-400 rounded-2xl flex items-center justify-center hover:bg-ep-green hover:text-white transition shadow-sm border border-slate-100"><i class="fas fa-lock text-xl"></i></button>
+        </div>
+    </nav>
+
+    <!-- VISÃO CLIENTE -->
+    <template x-if="view === 'client'">
+        <div>
+            <!-- HERO -->
+            <header class="relative min-h-[95vh] flex items-center overflow-hidden">
+                <div class="absolute inset-0 z-0">
+                    <img src="https://images.unsplash.com/photo-1613490493576-7fde63acd811?q=80&w=1600" class="w-full h-full object-cover">
+                    <div class="absolute inset-0 hero-overlay"></div>
+                </div>
+                <div class="relative z-10 container mx-auto px-4 text-left text-white max-w-4xl">
+                    <div class="inline-flex items-center gap-3 bg-white/10 backdrop-blur-xl px-6 py-3 rounded-2xl text-[11px] font-black uppercase tracking-widest mb-10 border border-white/20 pulse-live">
+                        <span class="w-3 h-3 bg-ep-green rounded-full shadow-[0_0_15px_#0d5e35]"></span> DISPONÍVEL
+                    </div>
+                    <h2 class="text-6xl md:text-[90px] font-black leading-[0.9] uppercase tracking-tighter mb-10">A Autoridade <br><span class="text-ep-green italic">no mercado</span> <br>imobiliário.</h2>
+                    <p class="text-xl md:text-2xl text-slate-300 mb-12 max-w-2xl font-light">Regularização jurídica e gestão estratégica de ativos em toda Angola.</p>
+                    <div class="flex flex-wrap gap-6 text-left">
+                        <a href="#imoveis" class="bg-white text-slate-900 px-12 py-7 rounded-[30px] font-black shadow-2xl hover:scale-105 transition uppercase text-xs tracking-widest">Ver Ativos</a>
+                        <button @click="view = 'about'; window.scrollTo(0,0)" class="bg-ep-green text-white px-12 py-7 rounded-[30px] font-black hover:shadow-2xl transition uppercase text-xs tracking-widest">Nossa História</button>
+                    </div>
+                </div>
+            </header>
+
+            <!-- NÚMEROS SORTEIO -->
+            <section class="py-24 bg-white border-b border-slate-100">
+                <div class="container mx-auto px-4 grid grid-cols-2 lg:grid-cols-4 gap-12 text-center font-black">
+                    <div class="flex flex-col items-center">
+                        <div class="text-7xl text-ep-green mb-2 tracking-tighter"><span class="lottery-num" x-text="count1">000</span><span>+</span></div>
+                        <p class="text-[10px] text-slate-400 uppercase tracking-[0.5em]">Ativos Legalizados</p>
+                    </div>
+                    <div class="flex flex-col items-center border-x border-slate-100 px-4">
+                        <div class="text-7xl text-slate-900 mb-2 tracking-tighter"><span class="lottery-num" x-text="count2">00</span><span>%</span></div>
+                        <p class="text-[10px] text-slate-400 uppercase tracking-[0.5em]">Rigor Técnico</p>
+                    </div>
+                    <div class="flex flex-col items-center">
+                        <div class="text-7xl text-ep-green mb-2 tracking-tighter"><span class="lottery-num" x-text="count3">00</span><span>+</span></div>
+                        <p class="text-[10px] text-slate-400 uppercase tracking-[0.5em]">Anos de Mercado</p>
+                    </div>
+                    <div class="flex flex-col items-center border-l border-slate-100 px-4">
+                        <div class="text-7xl text-slate-900 mb-2 tracking-tighter"><span class="lottery-num" x-text="count4">000</span><span>+</span></div>
+                        <p class="text-[10px] text-slate-400 uppercase tracking-[0.5em]">Soluções Entregues</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SERVIÇOS TÉCNICOS -->
+            <section id="servicos" class="py-32 bg-slate-50 text-left">
+                <div class="container mx-auto px-4">
+                    <div class="mb-20">
+                        <span class="text-ep-green font-black uppercase text-xs tracking-[0.6em] block mb-4 italic">O Que Fazemos</span>
+                        <h2 class="text-5xl font-black text-slate-900 uppercase tracking-tighter leading-none">Nossa Estrutura Técnica</h2>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-12 text-left">
+                        <div class="bg-white p-12 rounded-[50px] shadow-sm border border-slate-100">
+                            <h4 class="text-ep-green font-black uppercase text-xs mb-10">01. Intermediação</h4>
+                            <ul class="space-y-6 text-slate-800 font-bold text-sm">
+                                <li>• Compra e venda de imóveis</li>
+                                <li>• Arrendamento residencial/comercial</li>
+                                <li>• Escritórios e terrenos</li>
+                                <li>• Agenciamento de imóveis</li>
+                            </ul>
+                        </div>
+                        <div class="bg-slate-900 p-12 rounded-[50px] shadow-2xl flex flex-col text-white transform md:-translate-y-10">
+                            <h4 class="text-ep-green font-black uppercase text-xs mb-10">02. Legalização e Obras</h4>
+                            <ul class="space-y-4 text-slate-300 font-medium text-sm">
+                                <li>• Direito de superfície e Desanexação</li>
+                                <li>• Certidão de Registo Predial</li>
+                                <li>• Croquis de localização fracionado</li>
+                                <li>• Projectos de arquitetura e Construção</li>
+                                <li>• Fiscalização de obras</li>
+                            </ul>
+                        </div>
+                        <div class="bg-white p-12 rounded-[50px] shadow-sm border border-slate-100">
+                            <h4 class="text-ep-green font-black uppercase text-xs mb-10">03. Especializados</h4>
+                            <ul class="space-y-6 text-slate-800 font-bold text-sm">
+                                <li>• Gestão de propriedades e edifícios</li>
+                                <li>• Estruturação de financiamento</li>
+                                <li>• Avaliação técnica de ativos</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- PORTFÓLIO -->
+            <section id="imoveis" class="py-32 container mx-auto px-4 text-left">
+                <div class="flex flex-col md:flex-row justify-between items-end mb-20 gap-8">
+                    <div>
+                        <h2 class="text-5xl font-black uppercase tracking-tighter text-left">Portfólio</h2>
+                        <div class="w-32 h-3 bg-ep-green mt-4 rounded-full"></div>
+                    </div>
+                    <div class="bg-white p-4 rounded-3xl border shadow-xl flex items-center w-full md:w-96">
+                        <input type="text" x-model="search" placeholder="Zona Preferencial..." class="flex-1 px-4 outline-none font-bold text-sm text-left">
+                        <button class="bg-slate-900 text-white w-12 h-12 rounded-2xl transition hover:bg-ep-green"><i class="fas fa-search"></i></button>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-16">
+                    <template x-for="house in filteredHouses()" :key="house.id">
+                        <div class="bg-white rounded-[60px] overflow-hidden shadow-2xl transition-all duration-500 border border-slate-100 flex flex-col h-full hover:-translate-y-4">
+                            <div class="relative h-80 overflow-hidden text-left">
+                                <img :src="house.image" class="w-full h-full object-cover">
+                                <div class="absolute top-8 left-8 flex flex-col gap-3">
+                                    <span class="bg-ep-green text-white px-5 py-2 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-xl" x-text="house.type"></span>
+                                    <span class="bg-white/90 text-slate-900 px-5 py-2 rounded-2xl text-[10px] font-black uppercase shadow-lg" x-text="house.location"></span>
+                                </div>
+                            </div>
+                            <div class="p-12 flex-1 flex flex-col">
+                                <h3 class="text-2xl font-black mb-8 text-slate-800 leading-tight uppercase tracking-tight text-left" x-text="house.title"></h3>
+                                
+                                <template x-if="house.video">
+                                    <div class="mb-8">
+                                        <div x-show="!house.play" @click="house.play = true" class="bg-slate-50 p-7 rounded-[40px] flex items-center justify-center gap-5 cursor-pointer border-2 border-dashed border-slate-200">
+                                            <div class="w-14 h-14 bg-red-600 text-white rounded-full flex items-center justify-center shadow-xl animate-pulse"><i class="fas fa-play"></i></div>
+                                            <span class="font-black text-xs uppercase tracking-widest italic text-slate-500">Visita em Vídeo</span>
+                                        </div>
+                                        <!-- VÍDEO SEM SAIR DO SITE -->
+                                        <div x-show="house.play" class="rounded-[40px] overflow-hidden aspect-video bg-black shadow-2xl">
+                                            <iframe class="w-full h-full" :src="getEmbedUrl(house.video)" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                                        </div>
+                                    </div>
+                                </template>
+
+                                <div class="flex justify-between items-center pt-10 border-t border-slate-100 mt-auto">
+                                    <div class="flex flex-col text-left">
+                                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1 italic">Preço do Ativo</span>
+                                        <span class="text-3xl font-black text-slate-900" x-text="formatCurrency(house.price)"></span>
+                                    </div>
+                                    <a :href="whatsappLink(house)" target="_blank" class="bg-green-500 text-white w-16 h-16 flex items-center justify-center rounded-[30px] hover:bg-green-600 shadow-xl transition-all"><i class="fab fa-whatsapp text-3xl"></i></a>
+                                </div>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+            </section>
+
+            <!-- FORMULÁRIO PARECER -->
+            <section id="form-tecnico" class="py-32 bg-slate-900 text-white text-left">
+                <div class="container mx-auto px-4 max-w-6xl">
+                    <div class="grid lg:grid-cols-2 gap-24 items-center">
+                        <div>
+                            <h2 class="text-6xl font-black uppercase tracking-tighter mb-8 leading-none">Parecer <br><span class="text-ep-green">Técnico Especializado</span></h2>
+                            <p class="text-slate-400 text-xl font-light italic leading-relaxed">Regularização administrativa e prospecção ativa de mercado em toda Angola.</p>
+                        </div>
+                        <div class="bg-white p-12 md:p-16 rounded-[70px] shadow-2xl text-slate-900 space-y-6">
+                            <h3 class="text-xl font-black uppercase mb-4 text-center">Gabinete de Atendimento</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-5 text-left">
+                                <input type="text" x-model="pedido.nome" placeholder="Seu Nome Completo" class="w-full bg-slate-50 p-6 rounded-3xl border-2 border-slate-100 outline-none focus:border-ep-green font-bold">
+                                <input type="text" x-model="pedido.contato" placeholder="WhatsApp" class="w-full bg-slate-50 p-6 rounded-3xl border-2 border-slate-100 outline-none focus:border-ep-green font-bold">
+                            </div>
+                            <select x-model="pedido.servico" class="w-full bg-slate-50 p-6 rounded-3xl border-2 border-slate-100 outline-none font-black text-xs uppercase text-slate-600">
+                                <option value="">Serviço Pretendido...</option>
+                                <option value="Legalização">Direito de Superfície / Legalização</option>
+                                <option value="Croquis">Croquis de Localização</option>
+                                <option value="Projecto">Projectos de Arquitetura / Obras</option>
+                                <option value="Intermediação">Mediação (Compra / Venda)</option>
+                            </select>
+                            <textarea x-model="pedido.descricao" placeholder="Dê-nos detalhes da sua necessidade técnica..." class="w-full bg-slate-50 p-6 rounded-3xl border-2 border-slate-100 outline-none h-32 font-medium"></textarea>
+                            <button @click="enviarPedido()" class="w-full bg-ep-green text-white py-8 rounded-[35px] font-black uppercase shadow-xl hover:bg-green-900 transition flex items-center justify-center gap-4 text-sm"><i class="fab fa-whatsapp text-3xl"></i> Enviar Solicitação</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </template>
+
+    <!-- PÁGINA SOBRE NÓS -->
+    <template x-if="view === 'about'">
+        <div class="bg-white min-h-screen pb-40 text-left animate-fadeIn">
+            <div class="bg-slate-900 py-32 text-white text-center relative overflow-hidden">
+                <img src="https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=1600" class="absolute inset-0 w-full h-full object-cover opacity-20 grayscale">
+                <div class="relative z-10 container mx-auto px-4 max-w-4xl">
+                    <button @click="view = 'client'; window.scrollTo(0,0)" class="text-ep-green font-black uppercase text-xs tracking-[0.4em] mb-12 inline-flex items-center gap-4 hover:gap-6 transition-all"><i class="fas fa-arrow-left"></i> Voltar aos Imóveis</button>
+                    <h2 class="text-6xl md:text-8xl font-black uppercase tracking-tighter">Sobre Nós</h2>
+                </div>
+            </div>
+            <div class="container mx-auto px-4 max-w-4xl py-24 text-left">
+                <div class="space-y-20">
+                    <div class="border-l-8 border-ep-green pl-10 md:pl-16 text-left">
+                        <h3 class="text-4xl font-black uppercase tracking-tight text-slate-900 mb-8 leading-none">Nossa Identidade</h3>
+                        <p class="text-slate-600 text-xl leading-[2] font-medium italic text-left">Somos a sua parceira estratégica no setor imobiliário, dedicada a oferecer soluções completas e integradas para quem busca segurança, agilidade e transparência. Com uma visão 360º do mercado, atuamos desde a mediação comercial até a complexa regularização jurídica de ativos, garantindo que o seu património esteja sempre em boas mãos. A nossa missão é simplificar o processo imobiliário, transformando burocracia em resultados e sonhos em realidade.</p>
+                    </div>
+                </div>
+                <div class="mt-20 text-center border-t border-slate-100 pt-20">
+                    <button @click="view = 'client'; window.scrollTo(0,0)" class="bg-slate-900 text-white px-16 py-7 rounded-[40px] font-black uppercase tracking-widest hover:bg-ep-green transition-all shadow-2xl">Página Inicial</button>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <!-- PAINEL ADMIN -->
+    <template x-if="view === 'admin'">
+        <main class="container mx-auto px-4 py-24 text-left">
+            <div class="bg-white p-12 rounded-[70px] shadow-2xl border-t-[20px] border-ep-green">
+                <div class="flex justify-between items-center mb-16">
+                    <h2 class="text-3xl font-black uppercase tracking-tighter">Gestão Técnica</h2>
+                    <div class="flex gap-4">
+                        <button @click="openModal()" class="bg-ep-green text-white px-10 py-5 rounded-3xl font-black text-[10px] uppercase shadow-lg">+ Novo Imóvel</button>
+                        <button @click="view = 'client'; isLogged = false" class="text-slate-400 font-bold underline italic">Sair</button>
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 gap-6">
+                    <template x-for="house in houses" :key="house.id">
+                        <div class="flex items-center justify-between p-8 bg-slate-50 rounded-[45px] border border-slate-100 shadow-sm text-left">
+                            <div class="flex items-center gap-10">
+                                <img :src="house.image" class="w-28 h-28 rounded-[35px] object-cover shadow-lg border-4 border-white transition group-hover:rotate-3">
+                                <div>
+                                    <h4 class="font-black text-xl uppercase tracking-tighter text-left" x-text="house.title"></h4>
+                                    <p class="text-ep-green font-black text-lg mt-1 text-left" x-text="formatCurrency(house.price)"></p>
+                                </div>
+                            </div>
+                            <div class="flex gap-8 font-black text-[10px] uppercase tracking-widest text-left">
+                                <button @click="editHouse(house)" class="text-blue-600 hover:underline">Editar</button>
+                                <button @click="deleteHouse(house.id)" class="text-red-500 hover:underline">Eliminar</button>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+            </div>
+        </main>
+    </template>
+
+    <!-- LOGIN -->
+    <div x-show="showLogin" class="fixed inset-0 z-[300] flex items-center justify-center p-4" x-cloak x-transition>
+        <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-md" @click="showLogin = false"></div>
+        <div class="relative glass-login w-full max-w-md p-12 rounded-[50px] shadow-2xl text-center text-white">
+            <div class="w-20 h-20 bg-ep-green text-white rounded-3xl flex items-center justify-center mx-auto mb-8 text-3xl shadow-xl"><i class="fas fa-fingerprint"></i></div>
+            <h3 class="text-2xl font-black uppercase tracking-widest mb-2">Área Técnica</h3>
+            <p class="text-slate-400 text-xs mb-10 font-bold uppercase tracking-widest">Acesso Restrito</p>
+            <input type="password" x-model="loginPass" @keydown.enter="verificarLogin()" placeholder="CÓDIGO" class="w-full bg-white/5 border border-white/10 p-6 rounded-3xl text-center text-white outline-none focus:border-ep-green transition-all mb-6 font-black tracking-[0.5em]">
+            <button @click="verificarLogin()" class="w-full bg-ep-green text-white py-6 rounded-3xl font-black uppercase shadow-xl hover:bg-green-700 transition">Entrar</button>
+        </div>
+    </div>
+
+    <!-- MODAL REGISTO (COM MÁSCARA DE PREÇO) -->
+    <div x-show="showModal" class="fixed inset-0 bg-slate-900/98 backdrop-blur-2xl flex items-center justify-center p-4 z-[400]" x-cloak>
+        <div class="bg-white rounded-[70px] w-full max-w-2xl p-16 shadow-2xl overflow-y-auto max-h-[90vh] text-left">
+            <h3 class="text-3xl font-black mb-12 text-center uppercase tracking-tighter" x-text="isEditing ? 'Actualizar Ficha' : 'Novo Activo Técnico'"></h3>
+            <div class="space-y-6 text-left">
+                <div>
+                    <label class="text-[10px] uppercase font-black text-slate-400 ml-4 mb-2 block tracking-widest text-left">Designação</label>
+                    <input type="text" x-model="form.title" class="w-full bg-slate-50 border-2 p-6 rounded-3xl outline-none focus:border-ep-green font-bold text-left">
+                </div>
+                <div class="grid grid-cols-2 gap-6 text-left">
+                    <div>
+                        <label class="text-[10px] uppercase font-black text-slate-400 ml-4 mb-2 block tracking-widest">Valor (Moeda Corrente)</label>
+                        <!-- INPUT COM PREÇO PROGRAMADO/MÁSCARA -->
+                        <input type="number" x-model="form.price" placeholder="50.000.000" class="w-full bg-slate-50 border-2 p-6 rounded-3xl outline-none font-black text-ep-green text-lg">
+                        <div class="text-[10px] mt-1 ml-4 font-bold text-slate-400" x-text="'Visualização: ' + formatCurrency(form.price || 0)"></div>
+                    </div>
+                    <div>
+                        <label class="text-[10px] uppercase font-black text-slate-400 ml-4 mb-2 block tracking-widest">Localização</label>
+                        <input type="text" x-model="form.location" class="w-full bg-slate-50 border-2 p-6 rounded-3xl outline-none font-bold">
+                    </div>
+                </div>
+                <div>
+                    <label class="text-[10px] uppercase font-black text-slate-400 ml-4 mb-2 block tracking-widest text-left">URL Foto (ImgBB)</label>
+                    <input type="text" x-model="form.image" placeholder="https://..." class="w-full bg-slate-50 border-2 p-6 rounded-3xl outline-none font-medium">
+                </div>
+                <div>
+                    <label class="text-[10px] uppercase font-black text-slate-400 ml-4 mb-2 block tracking-widest text-left">Link Vídeo YouTube</label>
+                    <input type="text" x-model="form.video" placeholder="Link do vídeo para o tour interno" class="w-full bg-red-50 border-2 border-red-100 p-6 rounded-3xl outline-none font-bold text-left">
+                </div>
+                <select x-model="form.type" class="w-full bg-slate-50 border-2 p-6 rounded-3xl outline-none font-black uppercase text-xs">
+                    <option value="venda">Venda</option>
+                    <option value="arrendamento">Arrendamento</option>
+                </select>
+            </div>
+            <div class="mt-14 flex gap-6">
+                <button @click="saveHouse()" class="flex-1 bg-ep-green text-white py-8 rounded-[30px] font-black uppercase tracking-widest shadow-xl">Gravar Ativo</button>
+                <button @click="showModal = false" class="flex-1 bg-slate-100 py-8 rounded-[30px] font-black uppercase text-slate-400 tracking-widest">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- RODAPÉ CORPORATIVO 2026 -->
+    <footer class="relative bg-slate-900 text-white pt-48 pb-20 overflow-hidden border-t-[20px] border-ep-green text-left">
+        <img src="https://images.unsplash.com/photo-1512917774080-9991f1c4c750?q=80&w=1600&auto=format&fit=crop" class="absolute inset-0 w-full h-full object-cover opacity-15 grayscale z-0">
+        <div class="absolute inset-0 footer-overlay z-10 text-left"></div>
+        <div class="container mx-auto px-4 relative z-20 grid grid-cols-1 md:grid-cols-3 gap-24 mb-32 text-left">
+            <div class="text-left">
+                <img src="https://i.ibb.co/B5v845dQ/logo.png" class="h-28 mb-12 brightness-200">
+                <h4 class="text-3xl font-black mb-6 uppercase tracking-tighter">EP Imobiliária</h4>
+                <p class="text-slate-400 text-sm italic font-medium leading-[2.5]">A SOLUÇÃO CERTA PARA COMPRAR, VENDER E LEGALIZAR PATRIMÓNIO EM ANGOLA.</p>
+            </div>
+            <div class="flex flex-col items-start text-left">
+                <h5 class="text-ep-green font-black uppercase text-xs tracking-widest mb-12 underline underline-offset-[15px] decoration-4">Atendimento Especializado</h5>
+                <ul class="space-y-8 text-slate-300 font-bold text-sm tracking-tight text-left">
+                    <li class="border-l-4 border-ep-green pl-6 py-1 uppercase">Seg-Sex: 08h00 - 17h00</li>
+                    <li class="border-l-4 border-ep-green pl-6 py-1 uppercase">Sábado: 08h00 - 12h00</li>
+                    <li class="pt-8 text-white"><i class="fas fa-phone-alt text-ep-green mr-4 scale-150"></i> +244 917 524 507</li>
+                    <li class="text-white"><i class="fas fa-phone-alt text-ep-green mr-4 scale-150"></i> +244 914 524 500</li>
+                </ul>
+            </div>
+            <div class="flex flex-col items-start text-left">
+                <h5 class="text-ep-green font-black uppercase text-xs tracking-widest mb-12 underline underline-offset-[15px] decoration-4">Sede Administrativa</h5>
+                <p class="text-slate-300 text-sm leading-loose font-medium mb-12 italic">Golf II, Soba Kapassa, Edifício 2AL – R/C, Apartamento nº 02. Luanda.</p>
+                <div class="flex gap-8">
+                    <a :href="social.fb" target="_blank" class="w-16 h-16 bg-white/5 rounded-[30px] border border-white/10 flex items-center justify-center hover:bg-ep-green transition shadow-lg"><i class="fab fa-facebook-f text-2xl"></i></a>
+                    <a :href="social.ig" target="_blank" class="w-16 h-16 bg-white/5 rounded-[30px] border border-white/10 flex items-center justify-center hover:bg-ep-green transition shadow-lg"><i class="fab fa-instagram text-2xl"></i></a>
+                    <a :href="social.wa" target="_blank" class="w-16 h-16 bg-green-600 rounded-[30px] flex items-center justify-center hover:bg-green-700 transition shadow-lg"><i class="fab fa-whatsapp text-3xl"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="relative z-20 text-center border-t border-white/5 pt-20 space-y-4 text-left md:text-center">
+            <p class="text-[11px] text-slate-500 font-black uppercase tracking-[1.5em]">© 2026 EP IMOBILIÁRIA</p>
+            <p class="text-[10px] text-slate-600 font-bold uppercase tracking-[0.25em] italic">Desenvolvido pela Comunidade dos Santos - 945 371 109</p>
+        </div>
+    </footer>
+
+    <script>
+        const SUPABASE_URL = 'https://ceslnhqggdxiqlzkaieq.supabase.co';
+        const SUPABASE_KEY = 'sb_publishable_7snCspe4VqdE92g5rk83kg_gZGNcP5f'; 
+        const client = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        function epApp() {
+            return {
+                view: 'client', showModal: false, showLogin: false, isEditing: false, 
+                loginPass: '', senhaAdmin: 'ep2024', search: '',
+                houses: [], form: { id: null, title: '', price: '', location: '', image: '', video: '', type: 'venda' },
+                pedido: { nome: '', contato: '', servico: '', descricao: '' },
+                social: { wa: 'https://wa.me/244917524507', ig: 'https://www.instagram.com/epimobiliaria?igsh=ZDZuYzY5Z295ZTVr', fb: 'https://www.facebook.com/share/1GxwNPGGxw/' },
+                count1: 0, count2: 0, count3: 0, count4: 0,
+
+                async init() {
+                    const { data, error } = await client.from('imoveis').select('*').order('id', { ascending: false });
+                    if (!error) this.houses = data.map(h => ({ ...h, play: false }));
+                    setInterval(() => {
+                        this.count1 = Math.floor(Math.random() * 900) + 150;
+                        this.count2 = Math.floor(Math.random() * 40) + 60;
+                        this.count3 = Math.floor(Math.random() * 20) + 5;
+                        this.count4 = Math.floor(Math.random() * 800) + 200;
+                    }, 100);
+                },
+                verificarLogin() {
+                    if(this.loginPass === this.senhaAdmin) { this.view = 'admin'; this.showLogin = false; this.loginPass = ''; }
+                    else { alert("Código Inválido!"); this.loginPass = ''; }
+                },
+                filteredHouses() {
+                    if(!this.search) return this.houses;
+                    const s = this.search.toLowerCase();
+                    return this.houses.filter(h => h.location.toLowerCase().includes(s) || h.title.toLowerCase().includes(s) || h.type.toLowerCase().includes(s));
+                },
+                async saveHouse() {
+                    const d = { title: this.form.title, price: this.form.price, location: this.form.location, image: this.form.image, video: this.form.video, type: this.form.type };
+                    if(this.isEditing) { await client.from('imoveis').update(d).eq('id', this.form.id); } 
+                    else { await client.from('imoveis').insert([d]); }
+                    this.showModal = false; this.init();
+                },
+                async deleteHouse(id) { if(confirm("APAGAR?")) { await client.from('imoveis').delete().eq('id', id); this.init(); } },
+                openModal() { this.isEditing = false; this.form = { id: null, title: '', price: '', location: '', image: '', video: '', type: 'venda' }; this.showModal = true; },
+                editHouse(house) { this.isEditing = true; this.form = { ...house }; this.showModal = true; },
+                formatCurrency(v) { return new Intl.NumberFormat('pt-AO', { style: 'currency', currency: 'AOA' }).format(v); },
+                getEmbedUrl(url) {
+                    if(!url) return '';
+                    let id = url.includes('v=') ? url.split('v=')[1].split('&')[0] : url.split('be/')[1].split('?')[0];
+                    return `https://www.youtube.com/embed/${id}?autoplay=1&rel=0`;
+                },
+                whatsappLink(h) { 
+                    const t = `*EP IMOBILIÁRIA - CONSULTORIA*\n*Activo:* ${h.title}\n*Investimento:* ${this.formatCurrency(h.price)}`;
+                    return `${this.social.wa}?text=${encodeURIComponent(t)}`; 
+                },
+                enviarPedido() { 
+                    const t = `*NOVA SOLICITAÇÃO - EP IMOBILIÁRIA*\n👤 *Nome:* ${this.pedido.nome}\n📱 *Contacto:* ${this.pedido.contato}\n🛠️ *Serviço:* ${this.pedido.servico}\n📝 *Detalhes:* ${this.pedido.descricao}`;
+                    window.open(`${this.social.wa}?text=${encodeURIComponent(t)}`, '_blank'); 
+                }
+            }
+        }
+    </script>
+</body>
+</html>
